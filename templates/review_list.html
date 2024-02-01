@@ -62,7 +62,7 @@
                     type="button"
                     class="btn btn-secondary"
                     value="삭제하기"
-                    onclick=""
+                    onclick="deleteBtn('{{ review.id }}')"
                   />
                 </div>
               </div>
@@ -77,6 +77,7 @@
           aria-labelledby="exampleModalLabel{{ review.id }}"
           aria-hidden="true"
         >
+        <form action="{{ url_for('reviewUpdate') }}" method="get">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -94,8 +95,8 @@
                 ></button>
               </div>
               <div class="modal-body">
-                <form id="updateForm" method="POST">
-                  <input type="hidden" name="id" value="id" />
+                
+                  <input type="hidden" name="id" value="{{ review.id }}" />
                   <div class="mb-3">
                     <label for="recipient-name" class="col-form-label"
                       >작성자:</label
@@ -108,6 +109,8 @@
                       value="{{ review.username }}"
                       readonly
                     />
+                    <input type="hidden" name="user_id" value="{{ review.user_id }}" />
+                    <input type="hidden" name="tour_id" value="{{ review.tour_id }}" />
                     <label for="recipient-name" class="col-form-label"
                       >제목:</label
                     >
@@ -116,7 +119,6 @@
                       name="title"
                       class="form-control"
                       id="recipient-name"
-                      value="{{ review.title }}"
                     />
                   </div>
                   <div class="mb-3">
@@ -127,9 +129,7 @@
                       class="form-control"
                       id="message-text"
                       name="content"
-                    >
-{{ review.content }}</textarea
-                    >
+                    ></textarea>
                     <label for="recipient-name" class="col-form-label"
                       >이미지 URL:</label
                     >
@@ -138,10 +138,10 @@
                       name="image_url"
                       class="form-control"
                       id="recipient-name"
-                      value="{{ review.image_url }}"
+                      value=" {{ review.image_url }}"
                     />
                   </div>
-                </form>
+                
               </div>
               <div class="modal-footer">
                 <button
@@ -152,15 +152,15 @@
                   Close
                 </button>
                 <input
-                  type="button"
+                  type="submit"
                   class="btn btn-primary"
                   value="수정하기"
-                  onclick="updateReview('{{review.id}}')"
                 />
               </div>
             </div>
           </div>
         </div>
+      </form>
         {% endfor %}
       </div>
       <input
@@ -179,10 +179,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
       home = () => (location.href = "/");
-      updateReview = (id) => {
-        $("#updateForm")[0].action = "/review/" + id;
-        console.dir($("#updateForm"));
-        $("#updateForm").submit();
+      deleteBtn = (delete_id) => {
+        if (confirm("삭제하시겠습니까?")) {
+          location.href = `/delete_review/${delete_id}`;
+        }
       };
     </script>
   </body>
