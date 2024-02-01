@@ -14,7 +14,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] =\
 
 db = SQLAlchemy(app)
 
-#준성
+# 준성
+
+
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
@@ -23,8 +25,10 @@ class users(db.Model):
 
     def __repr__(self):
         return f'<users {self.username}>'
-    
+
     # 리뷰 데이터베이스 모델
+
+
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
@@ -46,9 +50,10 @@ class Review(db.Model):
 
 #     def __repr__(self):
 # return f'<review {self.user_id}>'
-    
+
+
 def check_duplicate(username, email):
-    #아이디,이메일 중복체크
+    # 아이디,이메일 중복체크
     existing_username = users.query.filter_by(username=username).first()
     existing_email = users.query.filter_by(email=email).first()
     if existing_username:
@@ -57,19 +62,22 @@ def check_duplicate(username, email):
         return 'email'
     else:
         return None
-    
+
+
 @app.route('/')
 def home():
     return render_template('home.html')
-    
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    #로그인
+    # 로그인
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
-        user = users.query.filter_by(username=username, password=password).first()
+
+        user = users.query.filter_by(
+            username=username, password=password).first()
         if user:
             # 로그인 성공 알림창
             return render_template('login.html', success_message='로그인 성공!')
@@ -79,9 +87,10 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/users/signup', methods=['GET', 'POST'])
 def userRegister():
-    #회원가입
+    # 회원가입
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -110,19 +119,18 @@ def userRegister():
 @app.route('/myreview')
 @login_required
 def my_review():
-    #마이 리뷰 페이지
+    # 마이 리뷰 페이지
     reviews = review.query.filter_by(user_id=current_user.id).all()
     return render_template('myreview.html', reviews=reviews)
 
 
-#윤하
+# 윤하
 # 여행지 db 모델
 class Tour(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     location = db.Column(db.String, nullable=False)
     image_url = db.Column(db.String)
-    
 
     def __repr__(self):
         return f'{self.title}>'
@@ -140,6 +148,7 @@ def home_index():
 @app.route('/review')
 def review():
     return render_template('review_register.html')
+
 
 @app.route('/reviewRegister')
 def reviewRegister():
@@ -182,28 +191,34 @@ def reviewUpdate(review_id):
     db.session.commit()
     return redirect(url_for('reviewList'))
 
-#경민
+# 경민
 # api 를 가져옴
+
+
 def get_tour_data():
     url = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=LsnvZ6LbK7IaMZ34Ob%2Fa9UpLifnuczwa7gMEfWZDbr3MsnFM5gAZuCcacAhQzr7ggfxiq1o34hkIVZ6HSuVGIQ%3D%3D&numOfRows=50&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&areaCode=1"
-    response = requests.get(url,verify=certifi.where())
+    response = requests.get(url, verify=certifi.where())
     data = response.json()
     return data['response']['body']['items']['item']
 
 # db 에 저장
+
+
 def save_to_db(tour_data):
     for item in tour_data:
         existing_tour = Tour.query.filter_by(title=item['title']).first()
         if not existing_tour:
             new_tour = Tour(
-                title=item['title'], 
-                location=item['addr1'], 
+                title=item['title'],
+                location=item['addr1'],
                 image_url=item.get('firstimage', '')  # 이미지 URL 추가
             )
             db.session.add(new_tour)
     db.session.commit()
 
-# tour.title 을 이용하여 관광지 검색  
+# tour.title 을 이용하여 관광지 검색
+
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
@@ -217,18 +232,20 @@ def search():
 @app.route('/index')
 def index():
     tour_data = get_tour_data()
-    save_to_db(tour_data[:50])  #  50개만 저장
+    save_to_db(tour_data[:50])  # 50개만 저장
     saved_tours = Tour.query.all()
 
     return render_template('index.html', data=saved_tours)
 
-#시현
+# 시현
 # 외부API에서 여행지 가져오기
+
+
 def get_tourist_place_details(content_id):
     # API service key
     service_key = "e1MMpT7St3EHSxcRRYM4EM%2BKpD%2BYa07ocfY%2BrKoJzauIJcoridA7C0dw2pacHyCGWAZ6NtZeFMNsGpY5fHYusw%3D%3D"
     URL = f"http://apis.data.go.kr/B551011/KorService1/detailCommon1?ServiceKey={service_key}&contentId={content_id}&MobileOS=ETC&MobileApp=SeoulViewer&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&_type=json"
-    
+
     response = requests.get(URL)
     if response.status_code == 200:
         return response.json()
@@ -238,14 +255,15 @@ def get_tourist_place_details(content_id):
 
 # id별로 다른 컨텐츠 가져오기
 @app.route('/place/<int:content_id>')
-def show_place_details(content_id=132215): 
+def show_place_details(content_id=132215):
     json_data = get_tourist_place_details(content_id)
     if json_data:
-        item = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])[0]
+        item = json_data.get('response', {}).get(
+            'body', {}).get('items', {}).get('item', [])[0]
         return render_template('detail.html', place=item)
     else:
         return "Details not found", 404
-    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
