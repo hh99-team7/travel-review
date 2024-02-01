@@ -50,11 +50,7 @@
                     </li>
                     <!-- 로그인 성공시 데이터를 가져와서 if문에 전달 하세요 -->
                     <li class="nav-item">
-                        {% if false %}
-                        <a class="nav-link" href="#">Logout</a>
-                        {% else %}
-                        <a class="nav-link" href="{{url_for('login')}}">Login</a>
-                        {% endif %}
+                        <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -78,7 +74,6 @@
         {% for item in data %}
         <div class="col">
             <a href="{{ url_for('show_place_details', content_id=item.content_id) }}" class="card-link">
-
                 <div class="card h-100">
                     {% if item.image_url %}
                     <img src="{{ item.image_url }}" alt="{{ item.title }}" class="card-img-top"

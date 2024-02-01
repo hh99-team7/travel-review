@@ -7,7 +7,7 @@ import os
 import requests
 from flask_sqlalchemy import SQLAlchemy
 import certifi
-
+from bs4 import BeautifulSoup
 
 
 ################################# 사전 정의 및 초기화 #######################################
@@ -23,11 +23,6 @@ login_manager.init_app(app)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'database.db')
 
-# # 사용자 정보는 임시로 딕셔너리에 저장
-# user_data = {
-#     'userid1': 'password1',
-#     'userid1': 'password2'
-# }
 
 db = SQLAlchemy(app)
 
@@ -84,10 +79,12 @@ with app.app_context():
 ################################# Home 관련 ##################################################
 
 # @app.route('/seoul-viewer/<default_list>')
-@app.route('/')
-def home(default_list : 'list[Tour]' = []):
-    """ homepage main """
-    return render_template('home.html', data = default_list)
+# @app.route('/')
+# def home():
+#     """ homepage main """
+#     # return render_template('home.html', data = default_list)
+#     return redirect(url_for('home_index'))
+
 
 def get_tour_data():
     url = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=LsnvZ6LbK7IaMZ34Ob%2Fa9UpLifnuczwa7gMEfWZDbr3MsnFM5gAZuCcacAhQzr7ggfxiq1o34hkIVZ6HSuVGIQ%3D%3D&numOfRows=50&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&areaCode=1"
@@ -160,6 +157,7 @@ def login():
                 login_user(user)
                 session['username'] = username # 로그인 성공 시 세션에 사용자 이름 저장
                 return redirect(url_for('home_index'))
+
         else:
             # Stay on the login page with an error message
             return render_template('login.html', failure_message='로그인 실패! 사용자 이름 또는 비밀번호가 잘못되었습니다.')
@@ -174,9 +172,13 @@ def logout():
 @app.route('/')
 def index():
     if 'username' in session: # 세션에 username이 있으면 값을 반환
-        return render_template('index.html', username=session['username'])
+        # return render_template('home.html', username=session['username'])
+        return redirect(url_for('home_index'))
+
     else:
-        return render_template('index.html',logout_message="로그아웃!")
+        # return render_template('login.html',logout_message="로그아웃!")
+        return redirect(url_for('login'))
+
 
 @app.route('/users/signup', methods=['GET', 'POST'])
 def userRegister():
@@ -201,12 +203,12 @@ def userRegister():
             db.session.add(new_user)
             db.session.commit()
             print(f'회원가입 성공: username={username}, email={email}')
-            return render_template('home.html')
+            return redirect(url_for('home_index'))
+
     return render_template('signup.html')
 
 
 @app.route('/myreview')
-# @login_required
 def my_review():
     # 마이 리뷰 페이지
     reviews = Review.query.filter_by(user_id=current_user.id).all()
@@ -239,10 +241,10 @@ def get_tourist_place_details(content_id):
 # id별로 다른 컨텐츠 가져오기
 @app.route('/details/<int:content_id>')
 def show_place_details(content_id):
-    if not current_user.is_authenticated:
-        # Store the intended URL to redirect back after login
-        next_url = url_for('show_place_details', content_id=content_id)
-        return redirect(url_for('login', next=next_url))
+    # if not current_user.is_authenticated:
+    #     # Store the intended URL to redirect back after login
+    #     next_url = url_for('show_place_details', content_id=content_id)
+    #     return redirect(url_for('login', next=next_url))
     
     json_data = get_tourist_place_details(content_id)
 
