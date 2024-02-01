@@ -38,13 +38,13 @@ with app.app_context():
     db.create_all()
 
 
-# @app.route("/")
-# def home():
-#     """ 상세 페이지 리다이렉트"""
-#     return redirect(url_for('review'))
+@app.route("/")
+def home():
+    """ 상세 페이지 리다이렉트"""
+    return redirect(url_for('review'))
 
 
-@app.route("/detail_review")
+@app.route("/review")
 def review():
     """ 상세 페이지 연결"""
     context = {
