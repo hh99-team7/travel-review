@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>상세페이지</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <style></style>
+  </head>
+
+  <body data-bs-theme="dark">
+    <div class="background-banner">
+      <nav
+        class="navbar border-bottom border-bottom-dark d-flex justify-content-space-between"
+        data-bs-theme="dark"
+      >
+        <div class="ms-3">
+          <img
+            src="https://s3.ap-northeast-2.amazonaws.com/materials.spartacodingclub.kr/webjong/images/sparta-logo.svg"
+            alt=""
+          />
+        </div>
+        <nav class="navbar navbar-expand-lg">
+          <div class="container-fluid">
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link text-white" href="{{url_for('review')}}"
+                    >MY REVIEW
+                  </a>
+                </li>
+                <li class="nav-item">
+                  {% if data.is_login %}
+                  <a class="nav-link text-white" href="#">Logout </a>
+                  {% else %}
+                  <a class="nav-link text-white" href="#">Login </a>
+                  {% endif %}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </nav>
+
+      <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold text-body-emphasis">동대문역사문화공원</h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-4">서울 중구</p>
+          <img
+            src="https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=76c50456-b01a-4b52-ad2b-3b6c1bc9d4f4"
+            class="img-fluid"
+            width="700"
+            height="300"
+          />
+        </div>
+        <div class="px-4 py-5 my-5 text-start">
+          <p class="lead mb-4">여행지 소개</p>
+          <hr class="my-2" />
+          동대문역사문화공원은 서울특별시 중구의 옛 동대문운동장 자리에 조성한
+          공원이다. 서울의 옛 역사와 문화를 보여주는 테마공원이자, 현대의
+          디자인과 문화를 경험할 수 있는 전시관 및 행사장, 시민들의
+          휴식공간이다. 2008년 동대문운동장을 철거하고 공원화하는 과정에서
+          조선시대의 서울성곽인 이간수문과 치성, 하도감과 훈련도감 터를 비롯한
+          건물지 유구 44기, 조선백자와 분청사기 등의 도자류를 포함해 주요 유물
+          1,000여 점이 출토되었다. 발굴된 유물은 공원 곳곳에 보존해 전시하고
+          있다. 공원 입구에는 동대문운동장 기념관이 있다. 옛 동대문운동장의
+          추억과 역대 스포츠 경기 정보, 각종 스포츠 관련 유물과 옛 동대문
+          운동장의 모형을 전시하고 있다. 수도권 지하철 2, 4, 5호선
+          동대문역사문화공원역 1번 출구에서 26m에 있다.
+          동대문디자인플라자(DDP)와 신당동 떡볶이거리가 도보 10분 거리에 있어
+          함께 둘러보기 좋다.
+        </div>
+
+
+        <div class="px-4 py-5 my-5 text-start">
+          <p class="lead mb-4">리뷰</p>
+          <hr class="my-2" />
+          {% for review in data.review %}
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-2">
+                <img src="..." class="img-fluid rounded-start" alt="...">
+              </div>
+              <div class="col-md-10" >
+                <div class="card-header">
+                    <p>{{review.user_id}}</p>
+                  </div>
+                <div class="card-body">
+                <p class="card-text">{{ review.content }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        
+         
+          <!-- login -->
+          {% if data.is_login %}
+          <div class="d-sm-flex justify-content-sm-center mt-2">
+            여행지에 대한 정보를 공유해보세요
+            <button
+              type="button"
+              class="btn btn-danger"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              리뷰 등록하기
+            </button>
+          </div>
+          <!-- logout -->
+          {% else %} 리뷰를 등록하려면 로그인을 해주세요 {% endif %}
+        </div>
+      </div>
+    </div>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">리뷰작성</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ url_for('review_create')}}" method="post">
+              <div class="mb-3">
+                <label for="review_contents" class="form-label">내용</label>
+                    <textarea id="review_contents" name = "content" cols="30" rows="5" class="form-control" style="resize: none;"required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="img_url" class="form-label">이미지 URL</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="img_url"
+                  id="img_url"
+                />
+              </div>
+              <div class = "mb-3">
+                <label for ="point_box" class="form-label"required>평점</label>
+                <div class = "row gap-2" id ="point_box">
+                <div class ="col-sm">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="point"
+                    id="point"
+                  />
+                </div>
+                <div class="col-sm">/ 5</div>
+            </div>
+            </div>
+              </div>
+              <input type="hidden" name="user_id" value="user_id">
+              <input type="hidden" name="tour_id" value="tour_id">
+              <button type="submit" class="btn btn-danger">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
