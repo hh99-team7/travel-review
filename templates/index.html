@@ -3,9 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index</title>
+    <title>Document</title>
+    {% if session['username'] %}
+        <script>
+          alert("{{ success_message }}")
+        </script>
+
+    {% endif %}
+    
+    <a href="/review">리뷰 작성하기</a>
+    <a href="/review/list">리뷰 조회하기</a>
+    <a href="/logout">로그아웃</a>
   </head>
-  <body>
-    기본적인 Index 창 입니다.
-  </body>
+  <body></body>
 </html>
