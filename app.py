@@ -262,7 +262,7 @@ def show_place_details(content_id=132215):
 
 
 @app.route("/detail_review")
-def review():
+def detail_review():
     """ 상세 페이지 연결"""
     context = {
         'is_login': True,
