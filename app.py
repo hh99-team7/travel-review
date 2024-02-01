@@ -6,6 +6,8 @@ import requests
 from flask_sqlalchemy import SQLAlchemy
 from bs4 import BeautifulSoup
 import certifi
+import json
+import urllib.request
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -17,14 +19,18 @@ db = SQLAlchemy(app)
 #준성
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, nullable=False)
+
     username = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
 
     def __repr__(self):
         return f'<users {self.username}>'
+
     
-    # 리뷰 데이터베이스 모델
+
+# 리뷰 데이터베이스 모델
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
@@ -122,6 +128,7 @@ class Tour(db.Model):
     title = db.Column(db.String, nullable=False)
     location = db.Column(db.String, nullable=False)
     image_url = db.Column(db.String)
+
     
 
     def __repr__(self):
@@ -131,7 +138,6 @@ class Tour(db.Model):
 with app.app_context():
     db.create_all()
 
-
 @app.route('/index')
 def home_index():
     return render_template('index.html')
@@ -140,6 +146,7 @@ def home_index():
 @app.route('/review')
 def review():
     return render_template('review_register.html')
+
 
 @app.route('/reviewRegister')
 def reviewRegister():
@@ -186,7 +193,7 @@ def reviewUpdate(review_id):
 # api 를 가져옴
 def get_tour_data():
     url = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=LsnvZ6LbK7IaMZ34Ob%2Fa9UpLifnuczwa7gMEfWZDbr3MsnFM5gAZuCcacAhQzr7ggfxiq1o34hkIVZ6HSuVGIQ%3D%3D&numOfRows=50&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&areaCode=1"
-    response = requests.get(url,verify=certifi.where())
+    response = requests.get(url, verify=certifi.where())
     data = response.json()
     print("API Response:", data)  # Debugging line
     return data['response']['body']['items']['item']
@@ -197,8 +204,8 @@ def save_to_db(tour_data):
         existing_tour = Tour.query.filter_by(title=item['title']).first()
         if not existing_tour:
             new_tour = Tour(
-                title=item['title'], 
-                location=item['addr1'], 
+                title=item['title'],
+                location=item['addr1'],
                 image_url=item.get('firstimage', '')  # 이미지 URL 추가
             )
             db.session.add(new_tour)
@@ -218,7 +225,7 @@ def search():
 @app.route('/')
 def index():
     tour_data = get_tour_data()
-    save_to_db(tour_data[:50])  #  50개만 저장
+    save_to_db(tour_data[:50])  # 50개만 저장
     saved_tours = Tour.query.all()
 
     return render_template('main.html', data=saved_tours)
@@ -238,7 +245,7 @@ def get_tourist_place_details(content_id):
 
 
 # id별로 다른 컨텐츠 가져오기
-@app.route('/place/<int:content_id>')
+@app.route('/details/<int:content_id>')
 def show_place_details(content_id=132215): 
     json_data = get_tourist_place_details(content_id)
     if json_data:
@@ -247,6 +254,43 @@ def show_place_details(content_id=132215):
     else:
         return "Details not found", 404
     
+
+# @app.route("/")
+# def home():
+#     """ 상세 페이지 리다이렉트"""
+#     return redirect(url_for('review'))
+
+
+@app.route("/detail_review")
+def review():
+    """ 상세 페이지 연결"""
+    context = {
+        'is_login': True,
+        'review': Review.query.filter_by(user_id='user_id', tour_id='tour_id').all(),
+    }
+    return render_template('detail2.html', data=context)
+
+
+@app.route("/review/create/", methods=['POST'])
+def review_create():
+    """ 리뷰 저장 데모코드"""
+    context = {
+        'is_login': True,
+        'review': [],
+    }
+    user_id_res = request.form['user_id']
+    tour_id_res = request.form['tour_id']
+    content_res = request.form['content']
+    img_url_res = request.form['img_url']
+    point_res = request.form['point']
+
+    review = Review(user_id=user_id_res,
+                    tour_id=tour_id_res, content=content_res)
+    db.session.add(review)
+    db.session.commit()
+
+    return redirect(url_for('review', data=context))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
