@@ -215,6 +215,38 @@ def my_review():
     return render_template('review_list.html', reviews=reviews)
 
 
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+  user_id = request.form.get('user_id') # 수정
+  username = request.form.get('username')
+  email = request.form.get('email')
+  user = users.query.get(user_id)
+  if user:
+    user.username = username
+    user.email = email
+    db.session.commit()
+    return redirect(url_for('my_review')) # 프로필 페이지 또는 다른 페이지로 리다이렉션
+  else:
+    return 'User not found', 404
+
+
+@app.route('/delete_profile', methods=['POST'])
+def delete_profile():
+  user_id = request.form.get('user_id') # 수정
+  user_id = int(user_id) if user_id.isdigit() else None # user_id를 정수로 변환
+  if user_id is not None:
+    user = users.query.get(user_id)
+    if user:
+      db.session.delete(user)
+      db.session.commit()
+      return redirect(url_for('login')) # 홈페이지 또는 로그인 페이지로 리다이렉션
+    else:
+      return 'User not found', 404
+  else:
+    return 'Invalid user ID', 400
+
+
+
 
 ################################# 여행지 정보 관련 ##################################################
 
@@ -326,6 +358,9 @@ def reviewDelete(delete_id):
     db.session.delete(review)
     db.session.commit()
     return redirect(url_for('reviewList'))
+
+
+
 
 
 if __name__ == '__main__':
