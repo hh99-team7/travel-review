@@ -58,9 +58,9 @@ def check_duplicate(username, email):
     else:
         return None
     
-@app.route('/')
-def home():
-    return render_template('home.html')
+# @app.route('/')
+# def main():
+#     return render_template('main.html')
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -102,7 +102,7 @@ def userRegister():
             db.session.add(new_user)
             db.session.commit()
             print(f'회원가입 성공: username={username}, email={email}')
-            return render_template('home.html')
+            return render_template('main.html')
 
     return render_template('signup.html')
 
@@ -188,6 +188,7 @@ def get_tour_data():
     url = "http://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=LsnvZ6LbK7IaMZ34Ob%2Fa9UpLifnuczwa7gMEfWZDbr3MsnFM5gAZuCcacAhQzr7ggfxiq1o34hkIVZ6HSuVGIQ%3D%3D&numOfRows=50&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&areaCode=1"
     response = requests.get(url,verify=certifi.where())
     data = response.json()
+    print("API Response:", data)  # Debugging line
     return data['response']['body']['items']['item']
 
 # db 에 저장
@@ -209,18 +210,18 @@ def search():
     if request.method == 'POST':
         search_title = request.form['search_title']
         results = Tour.query.filter(Tour.title.contains(search_title)).all()
-        return render_template('index.html', data=results)
-    return render_template('index.html', data=[])
+        return render_template('main.html', data=results)
+    return render_template('main.html', data=[])
 
 
 # 서버가 켜지면 루트에 api 데이터 50개 저장
-@app.route('/index')
+@app.route('/')
 def index():
     tour_data = get_tour_data()
     save_to_db(tour_data[:50])  #  50개만 저장
     saved_tours = Tour.query.all()
 
-    return render_template('index.html', data=saved_tours)
+    return render_template('main.html', data=saved_tours)
 
 #시현
 # 외부API에서 여행지 가져오기
