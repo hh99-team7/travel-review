@@ -10,33 +10,28 @@
     <div class="container mt-5">
         <h2>서울 관광 명소 찾기</h2>
         <form action="/search" method="post">
-          <input type="text" name="search_title" placeholder="여행지를 검색하세요">
-          <button type="submit">검색</button>
-      </form>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>이름</th>
-                    <th>주소</th>
-                    <th>사진</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in data %}
-                    <tr>
-                        <td>{{ item.title }}</td>
-                        <td>{{ item.location }}</td>
-                        <td>
-                            {% if item.image_url %}
-                                <img src="{{ item.image_url }}" alt="{{ item.title }}" style="width: 100px; height: auto;">
-                            {% else %}
-                                이미지 없음
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <input type="text" name="search_title" placeholder="여행지를 검색하세요">
+            <button type="submit">검색</button>
+        </form>
+
+        <!-- 카드 레이아웃 -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for item in data %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if item.image_url %}
+                        <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.title }}">
+                    {% else %}
+                        <img src="placeholder-image-url" class="card-img-top" alt="이미지 없음">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <p class="card-text">{{ item.location }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
