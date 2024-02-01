@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Page</title>
+    <style>
+        /* CSS 스타일링은 여기에 추가하세요 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Sign Up Page</h2>
+    <!-- 회원가입 폼 -->
+    <form action="/users/signup" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        {% if message == 'username' %}
+            <p class="error">이미 사용 중인 아이디입니다.</p>
+        {% endif %}
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+
+        <label for="confirm_password">Confirm Password:</label>
+        <input type="password" id="confirm_password" name="confirm_password">
+        {% if message == 'password_mismatch' %}
+            <p class="error">비밀번호가 일치하지 않습니다.</p>
+        {% endif %}
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        {% if message == 'email' %}
+            <p class="error">이미 등록된 이메일 주소입니다.</p>
+        {% endif %}
+
+        <input type="submit" value="Sign Up">
+    </form>
+</body>
+</html>
