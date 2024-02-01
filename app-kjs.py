@@ -46,20 +46,38 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    #로그인
+    # POST 요청일 때 로그인 시도
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        print("Received username:", username)
+        print("Received password:", password)
         
-        user = users.query.filter_by(username=username, password=password).first()
-        if user:
-            # 로그인 성공 알림창
-            return render_template('login.html', success_message='로그인 성공!')
+        # 데이터베이스에서 사용자 확인
+        user = users.query.filter_by(username=username).first()
+        if user and user.password == password:
+            session['username'] = username  # 로그인 성공 시 세션에 사용자 이름 저장
+            return render_template('index.html', success_message=f"{username}님 안녕하세요!")
+            
         else:
             # 로그인 실패 알림창
             return render_template('login.html', failure_message='로그인 실패! 사용자 이름 또는 비밀번호가 잘못되었습니다.')
-
+    
+    # GET 요청일 때 로그인 페이지 표시
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)  # 세션에서 사용자 이름 제거
+    return redirect('/')
+
+@app.route('/')
+def index():
+    if 'username' in session: # 세션에 username이 있으면 값을 반환
+        return render_template('index.html', username=session['username'])
+    else:
+        return render_template('index.html',logout_message="로그아웃!")
 
 @app.route('/users/signup', methods=['GET', 'POST'])
 def userRegister():
@@ -87,13 +105,6 @@ def userRegister():
             return render_template('home.html')
 
     return render_template('signup.html')
-
-@app.route('/myreview')
-@login_required
-def my_review():
-    #마이 리뷰 페이지
-    reviews = review.query.filter_by(user_id=current_user.id).all()
-    return render_template('myreview.html', reviews=reviews)
 
 if __name__ == '__main__':
     app.run(debug=True)

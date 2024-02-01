@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, url_for, request, session
 from flask_login import current_user, login_required, LoginManager, login_manager, UserMixin, login_user
 import secrets
+
 import os
 import requests
 from flask_sqlalchemy import SQLAlchemy
@@ -18,8 +19,15 @@ app.secret_key = secret_key
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'database.db')
+
+# # 사용자 정보는 임시로 딕셔너리에 저장
+# user_data = {
+#     'userid1': 'password1',
+#     'userid1': 'password2'
+# }
 
 db = SQLAlchemy(app)
 
@@ -137,34 +145,31 @@ def check_duplicate(username, email):
 # def main():
 #     return redirect(url_for('home_index'))
     
+
 #로그인 화면
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # POST 요청일 때 로그인 시도
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print("Received username:", username)
-        print("Received password:", password)
         
         # 데이터베이스에서 사용자 확인
-        user = users.query.filter_by(username=username).first()
-        if user and user.password == password:
-            session['username'] = username  # 로그인 성공 시 세션에 사용자 이름 저장
-            return render_template('home.html', success_message=f"{username}님 안녕하세요!")
-            
+        user = users.query.filter_by(username=username, password=password).first()
+        if user:
+            if user:
+                login_user(user)
+                session['username'] = username # 로그인 성공 시 세션에 사용자 이름 저장
+                return redirect(url_for('home_index'))
         else:
-            # 로그인 실패 알림창
+            # Stay on the login page with an error message
             return render_template('login.html', failure_message='로그인 실패! 사용자 이름 또는 비밀번호가 잘못되었습니다.')
-    
-    # GET 요청일 때 로그인 페이지 표시
-    return render_template('login.html')
 
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # 세션에서 사용자 이름 제거
-    return redirect('/')
+    return redirect(url_for('login'))
 
 @app.route('/')
 def index():
@@ -175,7 +180,7 @@ def index():
 
 @app.route('/users/signup', methods=['GET', 'POST'])
 def userRegister():
-    #회원가입
+    """ 회원 가입 이상이 없으면 DB에 저장"""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -197,7 +202,6 @@ def userRegister():
             db.session.commit()
             print(f'회원가입 성공: username={username}, email={email}')
             return render_template('home.html')
-
     return render_template('signup.html')
 
 
@@ -235,10 +239,10 @@ def get_tourist_place_details(content_id):
 # id별로 다른 컨텐츠 가져오기
 @app.route('/details/<int:content_id>')
 def show_place_details(content_id):
-    # if not current_user.is_authenticated:
-    #     # Store the intended URL to redirect back after login
-    #     next_url = url_for('show_place_details', content_id=content_id)
-    #     return redirect(url_for('login', next=next_url))
+    if not current_user.is_authenticated:
+        # Store the intended URL to redirect back after login
+        next_url = url_for('show_place_details', content_id=content_id)
+        return redirect(url_for('login', next=next_url))
     
     json_data = get_tourist_place_details(content_id)
 
@@ -250,7 +254,7 @@ def show_place_details(content_id):
             'review': reviews,
         }
         item = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])[0]
-        return render_template('detail.html', place=item, user_id=current_user.id, data=context, content_id = content_id)
+        return render_template('detail.html', place=item, user_id=current_user.id, data=context, content_id = content_id, context=context)
     else:
         return "Details not found", 404
 
