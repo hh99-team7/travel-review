@@ -197,7 +197,10 @@
         {% endfor %}
       </div>
       <br>
-      <input type="button" class="btn btn-primary my-3" value="홈으로" onclick="home()" style ="width: 100px" />
+
+      <form action="{{ url_for('home_index') }}"class="d-flex justify-content-center align-items-center">
+        <button type="submit" class="btn btn-primary my-3" style ="width: 100px" >홈으로</button>
+    </form>
     </div>
     <!-- Edit Profile Modal -->
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"

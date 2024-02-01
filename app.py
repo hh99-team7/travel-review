@@ -203,6 +203,8 @@ def userRegister():
             db.session.add(new_user)
             db.session.commit()
             print(f'회원가입 성공: username={username}, email={email}')
+            login_user(new_user)
+
             return redirect(url_for('home_index'))
 
     return render_template('signup.html')
