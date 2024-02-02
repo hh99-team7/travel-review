@@ -358,7 +358,7 @@ def reviewUpdate():
 
     # 데이터베이스에 업데이트 저장
     db.session.commit()
-    return redirect(url_for('reviewList'))
+    return redirect(url_for('my_review'))
 
 # 리뷰 삭제 라우트
 @app.route('/delete_review/<delete_id>')
@@ -366,7 +366,7 @@ def reviewDelete(delete_id):
     review = Review.query.get_or_404(delete_id)
     db.session.delete(review)
     db.session.commit()
-    return redirect(url_for('reviewList'))
+    return redirect(url_for('my_review'))
 
 
 

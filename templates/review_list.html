@@ -88,7 +88,7 @@
           정보 수정</button>
         <button class="btn btn-outline-danger w-100" onclick="deleteProfile()">회원 탈퇴</button>
         <form id="deleteProfileForm" action="/delete_profile" method="post">
-          <input type="hidden" name="user_id" value="{{ current_user.id }}"> <!-- 수정: 사용자 ID를 숨겨진 필드로 추가 -->
+          <input type="hidden" name="id" value="{{ current_user.id }}"> <!-- 수정: 사용자 ID를 숨겨진 필드로 추가 -->
         </form>
       </div>
       <!-- <div class="col-md-9"> -->
