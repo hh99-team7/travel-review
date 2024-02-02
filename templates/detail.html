@@ -107,11 +107,11 @@
                     <div class="row g-0">
                         <div class="col-md-2">
                             {% if review.image_url %}
-                            <img style="height: 100%"src="{{review.image_url}}" class="img-fluid rounded-start"
+                            <img src="{{review.image_url}}" class="img-fluid rounded-start"
                                 alt="{{ place.title }} {{review.title}}"
                                 onerror="this.onerror=null; this.src='https://korean.visitseoul.net/data/POST/20170425//201704251508226961';">
                             {% else %}
-                            <img style="height: 100%" src="https://korean.visitseoul.net/data/POST/20170425//201704251508226961"
+                            <img src="https://korean.visitseoul.net/data/POST/20170425//201704251508226961"
                                 class="img-fluid rounded-start" alt="{{ place.title }} {{review.title}}">
                             {% endif %}
                         </div>
