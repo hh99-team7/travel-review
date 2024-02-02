@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Travel Review - Review(Register)</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <header
+      class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"
+    >
+      <a
+        href="/"
+        class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+      >
+        <svg class="bi me-2" width="40" height="32">
+          <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-4">리뷰작성</span>
+      </a>
+    </header>
+    <div class="container">
+      <form action="{{ url_for('reviewRegister') }}" method="post">
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="form-label">제목</label>
+          <input type="hidden" name="username" value="{{usernmae}}" />
+          <input type="hidden" name="content_id" value="{{ content_id }}">
+          <input type="hidden" name="user_id" value="{{user_id}}" />
+          <input
+            type="text"
+            class="form-control"
+            name="title"
+            id="exampleFormControlInput1"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlTextarea1" class="form-label"
+            >내용</label
+          >
+          <textarea
+            class="form-control"
+            name="content"
+            id="exampleFormControlTextarea1"
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="formFileMultiple" class="form-label">URL 입력</label>
+          <input
+            class="form-control"
+            name="image_url"
+            type="text"
+            id="formFileMultiple"
+          />
+        </div>
+        <input type="submit" class="btn btn-danger" value="리뷰 등록" />
+        <input
+          id="backBtn"
+          type="button"
+          class="btn btn-primary"
+          value="나가기"
+        />
+      </form>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+      $("#backBtn").click(() => {
+        history.back();
+      });
+    </script>
+  </body>
+</html>
