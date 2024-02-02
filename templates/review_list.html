@@ -198,9 +198,9 @@
       </div>
       <br>
 
-      <form action="{{ url_for('home_index') }}"class="d-flex justify-content-center align-items-center">
-        <button type="submit" class="btn btn-primary my-3" style ="width: 100px" >홈으로</button>
-    </form>
+      <form action="{{ url_for('home_index') }}" class="d-flex justify-content-center align-items-center">
+        <button type="submit" class="btn btn-primary my-3" style="width: 100px">홈으로</button>
+      </form>
     </div>
     <!-- Edit Profile Modal -->
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
@@ -217,11 +217,27 @@
       integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
       crossorigin="anonymous"></script>
     <script>
-      function deleteProfile() {
-        if (confirm('정말로 계정을 삭제하시겠습니까?')) {
-          document.getElementById('deleteProfileForm').submit(); // 'deleteProfileForm'은 삭제를 위한 폼의 ID입니다.
+      function deleteBtn(reviewId) {
+        if (confirm('이 리뷰를 삭제하시겠습니까?')) {
+          fetch('/delete_review/${reviewId}', {
+            method: 'GET'
+          }).then(response => {
+            if (response.ok) {
+              window.location.reload();
+            } else {
+              alert('리뷰를 삭제하는 데 실패했습니다.');
+            }
+          });
         }
       }
+      function deleteProfile() {
+        if (confirm('정말로 계정을 삭제하시겠습니까?')) {
+          document.getElementById('deleteProfileForm').submit();
+        }
+      }
+
+
+
     </script>
 </body>
 

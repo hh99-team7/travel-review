@@ -239,9 +239,15 @@ def delete_profile():
   if user_id is not None:
     user = users.query.get(user_id)
     if user:
+      # 사용자가 작성한 모든 리뷰를 찾아서 삭제
+      reviews = Review.query.filter_by(user_id=user_id).all()
+      for review in reviews:
+        db.session.delete(review)
+
+      # 사용자 계정 삭제
       db.session.delete(user)
       db.session.commit()
-      return redirect(url_for('login')) # 홈페이지 또는 로그인 페이지로 리다이렉션
+      return redirect(url_for('login'))
     else:
       return 'User not found', 404
   else:
@@ -299,7 +305,8 @@ def show_place_details(content_id):
 # 리뷰 작성 화면
 @app.route('/review/<int:content_id>')
 def review(content_id):
-    return render_template('review_regist.html', content_id=content_id, user_id=current_user.id)
+    username = users.query.filter_by(id=current_user.id).first()
+    return render_template('review_regist.html', content_id=content_id, username=username, user_id=current_user.id)
 
 
 # @app.route('/review')

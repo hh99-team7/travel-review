@@ -29,7 +29,7 @@
       <form action="{{ url_for('reviewRegister') }}" method="post">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">제목</label>
-          <input type="hidden" name="username" value="남윤하" />
+          <input type="hidden" name="username" value="{{usernmae}}" />
           <input type="hidden" name="content_id" value="{{ content_id }}">
           <input type="hidden" name="user_id" value="{{user_id}}" />
           <input
