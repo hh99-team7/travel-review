@@ -33,7 +33,9 @@ def load_user(user_id):
 
 ################################# DTO 설정 ##################################################
 
-#유저 db 모델
+# 유저 db 모델
+
+
 class users(db.Model, UserMixin):
     """ User DTO """
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +45,6 @@ class users(db.Model, UserMixin):
 
     def __repr__(self):
         return f'<users {self.username}>'
-
 
 
 # 리뷰 db 모델
@@ -58,9 +59,11 @@ class Review(db.Model):
     content = db.Column(db.String, nullable=False)
     image_url = db.Column(db.String, nullable=False)
 
+    users = db.relationship('users', backref='reviews')
+
     def __repr__(self):
         return f'id: {self.id}, 작성자: {self.username}, 제목: {self.title}, 내용: {self.content},'
-    
+
 
 # 여행지 db 모델
 class Tour(db.Model):
@@ -73,9 +76,10 @@ class Tour(db.Model):
     def __repr__(self):
         return f'{self.title}>'
 
+
 with app.app_context():
     db.create_all()
-    
+
 ################################# Home 관련 ##################################################
 
 # @app.route('/seoul-viewer/<default_list>')
@@ -94,6 +98,8 @@ def get_tour_data():
     return data['response']['body']['items']['item']
 
 # db 에 저장
+
+
 def save_to_db(tour_data):
     for item in tour_data:
         print(item)
@@ -107,8 +113,6 @@ def save_to_db(tour_data):
             )
             db.session.add(new_tour)
     db.session.commit()
-
-
 
 
 # 서버가 켜지면 루트에 api 데이터 50개 저장
@@ -126,7 +130,7 @@ def home_index():
 
 ################################# User 관련 ##################################################
 
-#아이디,이메일 중복체크
+# 아이디,이메일 중복체크
 def check_duplicate(username, email):
     existing_username = users.query.filter_by(username=username).first()
     existing_email = users.query.filter_by(email=email).first()
@@ -136,26 +140,27 @@ def check_duplicate(username, email):
         return 'email'
     else:
         return None
-    
+
 # #메인 화면
 # @app.route('/')
 # def main():
 #     return redirect(url_for('home_index'))
-    
 
-#로그인 화면
+
+# 로그인 화면
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
         # 데이터베이스에서 사용자 확인
-        user = users.query.filter_by(username=username, password=password).first()
+        user = users.query.filter_by(
+            username=username, password=password).first()
         if user:
             if user:
                 login_user(user)
-                session['username'] = username # 로그인 성공 시 세션에 사용자 이름 저장
+                session['username'] = username  # 로그인 성공 시 세션에 사용자 이름 저장
                 return redirect(url_for('home_index'))
 
         else:
@@ -164,14 +169,16 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # 세션에서 사용자 이름 제거
     return redirect(url_for('login'))
 
+
 @app.route('/')
 def index():
-    if 'username' in session: # 세션에 username이 있으면 값을 반환
+    if 'username' in session:  # 세션에 username이 있으면 값을 반환
         # return render_template('home.html', username=session['username'])
         return redirect(url_for('home_index'))
 
@@ -212,53 +219,51 @@ def userRegister():
 
 @app.route('/myreview')
 def my_review():
-    # 마이 리뷰 페이지
+    # 마이 리뷰 페이지x
     reviews = Review.query.filter_by(user_id=current_user.id).all()
     return render_template('review_list.html', reviews=reviews)
 
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
-  user_id = request.form.get('user_id') # 수정
-  username = request.form.get('username')
-  email = request.form.get('email')
-  user = users.query.get(user_id)
-  if user:
-    user.username = username
-    user.email = email
-    db.session.commit()
-    return redirect(url_for('my_review')) # 프로필 페이지 또는 다른 페이지로 리다이렉션
-  else:
-    return 'User not found', 404
+    user_id = request.form.get('user_id')  # 수정
+    username = request.form.get('username')
+    email = request.form.get('email')
+    user = users.query.get(user_id)
+    if user:
+        user.username = username
+        user.email = email
+        db.session.commit()
+        return redirect(url_for('my_review'))  # 프로필 페이지 또는 다른 페이지로 리다이렉션
+    else:
+        return 'User not found', 404
 
 
 @app.route('/delete_profile', methods=['POST'])
 def delete_profile():
-  user_id = request.form.get('user_id') # 수정
-  user_id = int(user_id) if user_id.isdigit() else None # user_id를 정수로 변환
-  if user_id is not None:
-    user = users.query.get(user_id)
-    if user:
-      # 사용자가 작성한 모든 리뷰를 찾아서 삭제
-      reviews = Review.query.filter_by(user_id=user_id).all()
-      for review in reviews:
-        db.session.delete(review)
+    user_id = request.form.get('user_id')  # 수정
+    user_id = int(user_id) if user_id.isdigit() else None  # user_id를 정수로 변환
+    if user_id is not None:
+        user = users.query.get(user_id)
+        if user:
+            # 사용자가 작성한 모든 리뷰를 찾아서 삭제
+            reviews = Review.query.filter_by(user_id=user_id).all()
+            for review in reviews:
+                db.session.delete(review)
 
-      # 사용자 계정 삭제
-      db.session.delete(user)
-      db.session.commit()
-      return redirect(url_for('login'))
+            # 사용자 계정 삭제
+            db.session.delete(user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        else:
+            return 'User not found', 404
     else:
-      return 'User not found', 404
-  else:
-    return 'Invalid user ID', 400
-
-
+        return 'Invalid user ID', 400
 
 
 ################################# 여행지 정보 관련 ##################################################
 
-# tour.title 을 이용하여 관광지 검색  
+# tour.title 을 이용하여 관광지 검색
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
@@ -267,11 +272,12 @@ def search():
         return render_template('home.html', data=results)
     return render_template('home.html', data=[])
 
+
 def get_tourist_place_details(content_id):
     # API service key
     service_key = "e1MMpT7St3EHSxcRRYM4EM%2BKpD%2BYa07ocfY%2BrKoJzauIJcoridA7C0dw2pacHyCGWAZ6NtZeFMNsGpY5fHYusw%3D%3D"
     URL = f"http://apis.data.go.kr/B551011/KorService1/detailCommon1?ServiceKey={service_key}&contentId={content_id}&MobileOS=ETC&MobileApp=SeoulViewer&defaultYN=Y&firstImageYN=Y&areacodeYN=Y&catcodeYN=Y&addrinfoYN=Y&mapinfoYN=Y&overviewYN=Y&_type=json"
-    
+
     response = requests.get(URL)
     if response.status_code == 200:
         return response.json()
@@ -279,13 +285,15 @@ def get_tourist_place_details(content_id):
         return None
 
 # id별로 다른 컨텐츠 가져오기
+
+
 @app.route('/details/<int:content_id>')
 def show_place_details(content_id):
     # if not current_user.is_authenticated:
     #     # Store the intended URL to redirect back after login
     #     next_url = url_for('show_place_details', content_id=content_id)
     #     return redirect(url_for('login', next=next_url))
-    
+
     json_data = get_tourist_place_details(content_id)
 
     if json_data:
@@ -295,8 +303,9 @@ def show_place_details(content_id):
             'is_login': True,
             'review': reviews,
         }
-        item = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])[0]
-        return render_template('detail.html', place=item, user_id=current_user.id, data=context, content_id = content_id, context=context)
+        item = json_data.get('response', {}).get(
+            'body', {}).get('items', {}).get('item', [])[0]
+        return render_template('detail.html', place=item, user_id=current_user.id, data=context, content_id=content_id, context=context)
     else:
         return "Details not found", 404
 
@@ -312,7 +321,6 @@ def review(content_id):
 # @app.route('/review')
 # def review():
 #     return render_template('review_regist.html')
-
 
 
 # 리뷰 등록
@@ -335,7 +343,6 @@ def reviewRegister():
     return redirect(url_for('show_place_details', content_id=tour_id_receive))
 
 
-
 # 리뷰 전체 보기
 @app.route('/review/list')
 def reviewList():
@@ -344,9 +351,12 @@ def reviewList():
     return render_template('review_list.html', reviews=reviews)
 
 # 리뷰 업데이트 라우트
+
+
 @app.route('/reviewUpdate')
 def reviewUpdate():
-    review_data = Review.query.filter_by(id=request.args.get("id")).first()
+    review_data = Review.query.filter_by(user_id=request.args.get("id")).first()
+    
     # 폼 데이터 가져오기
     username = request.args.get("username")
     review_data.username = username
@@ -354,7 +364,7 @@ def reviewUpdate():
     review_data.tour_id = request.args.get("tour_id")
     review_data.title = request.args.get("title")
     review_data.content = request.args.get("content")
-    review_data.image_url = request.args.get("image_url") 
+    review_data.image_url = request.args.get("image_url")
 
     # 데이터베이스에 업데이트 저장
     db.session.commit()
@@ -367,9 +377,6 @@ def reviewDelete(delete_id):
     db.session.delete(review)
     db.session.commit()
     return redirect(url_for('reviewList'))
-
-
-
 
 
 if __name__ == '__main__':
