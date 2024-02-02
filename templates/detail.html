@@ -51,7 +51,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg justify-content-center" style="background-color: #e3f2fd;">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/home">
                 <img src="{{ url_for('static', filename='images/SeoulViewer_logo.png') }}" alt="Seoul Viewer Logo">
                 <h2 class='logo_name' style="padding-top: 6px; padding-left: 7px;">서울뷰어 Seoul Viewer</h2>
             </a>
@@ -106,14 +106,22 @@
                 <div class="card mb-3">
                     <div class="row g-0">
                         <div class="col-md-2">
-                            <img src="{{review.image_url}}" class="img-fluid rounded-start" alt="{{ place.title }} {{review.title}}">
+                            {% if review.image_url %}
+                            <img src="{{review.image_url}}" class="img-fluid rounded-start"
+                                alt="{{ place.title }} {{review.title}}"
+                                onerror="this.onerror=null; this.src='https://korean.visitseoul.net/data/POST/20170425//201704251508226961';">
+                            {% else %}
+                            <img src="https://korean.visitseoul.net/data/POST/20170425//201704251508226961"
+                                class="img-fluid rounded-start" alt="{{ place.title }} {{review.title}}">
+                            {% endif %}
                         </div>
                         <div class="col-md-10">
                             <div class="card-header">
                                 <p>{{review.title}}</p>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">{{ review.content }}</p>
+                                <p class="card-text overflow-auto" style="height: 65px;">{{ review.content }}</p>
+                                <!-- <p class="card-text">{{ review.content }}</p> -->
                             </div>
                         </div>
                     </div>

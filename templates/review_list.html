@@ -43,7 +43,7 @@
 <body>
   <nav class="navbar navbar-expand-lg justify-content-center" style="background-color: #e3f2fd;">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">
+      <a class="navbar-brand" href="/home">
         <img src="{{ url_for('static', filename='images/SeoulViewer_logo.png') }}" alt="Seoul Viewer Logo">
         <h2 class='logo_name' style="padding-top: 6px; padding-left: 7px;">서울뷰어 Seoul Viewer</h2>
       </a>
@@ -67,7 +67,7 @@
 
   <div class="container">
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+      <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
         <svg class="bi me-2" width="40" height="32">
           <use xlink:href="#bootstrap"></use>
         </svg>
@@ -134,18 +134,26 @@
         </div>
       </div>
       <br>
-      <div class="row row-cols-1 row-cols-md-3 g-4">
+
+
+      <div class="row row-cols-1 row-cols-md-2 g-4">
         {% for review in reviews %}
         <div class="col">
           <div class="card mb-3" style="max-width: 540px">
             <div class="row g-0">
-              <div class="col-md-4">
-                <img src="{{ review.image_url }}" class="img-fluid rounded-start" alt="..." />
+              <div style="height: 247px;" class="col-md-4">
+                {% if review.image_url %}
+                <img style="height: 100%;" src="{{review.image_url}}" class="img-fluid rounded-start" alt="..."
+                  onerror="this.onerror=null; this.src='https://korean.visitseoul.net/data/POST/20170425//201704251508226961';">
+                {% else %}
+                <img style="height: 100%;" src="https://korean.visitseoul.net/data/POST/20170425//201704251508226961"
+                  class="img-fluid rounded-start">
+                {% endif %}
               </div>
               <div class="col-md-8">
                 <div class="card-body">
                   <h5 class="card-title">{{ review.title }}</h5>
-                  <p class="card-text">{{ review.content }}</p>
+                  <p class="card-text overflow-auto" style="height: 130px;">{{ review.content }}</p>
                   <input type="button" class="btn btn-warning" value="수정하기" onclick="" data-bs-toggle="modal"
                     data-bs-target="#exampleModal{{ review.id }}" data-bs-whatever="@mdo" />
                   <input type="button" class="btn btn-secondary" value="삭제하기" onclick="deleteBtn('{{ review.id }}')" />
@@ -170,15 +178,15 @@
                   <div class="mb-3">
                     <label for="recipient-name" class="col-form-label">작성자:</label>
                     <input type="text" name="username" class="form-control" id="recipient-name"
-                      value="{{ review.username }}" readonly />
+                      value="{{current_user.username }}" readonly />
                     <input type="hidden" name="user_id" value="{{ review.user_id }}" />
                     <input type="hidden" name="tour_id" value="{{ review.tour_id }}" />
                     <label for="recipient-name" class="col-form-label">제목:</label>
-                    <input type="text" name="title" class="form-control" id="recipient-name" />
+                    <input type="text" name="title" class="form-control" value="{{review.title}}" id="recipient-name" />
                   </div>
                   <div class="mb-3">
                     <label for="message-text" class="col-form-label">리뷰 내용:</label>
-                    <textarea class="form-control" id="message-text" name="content"></textarea>
+                    <textarea class="form-control" id="message-text" name="content">{{review.content}}</textarea>
                     <label for="recipient-name" class="col-form-label">이미지 URL:</label>
                     <input type="text" name="image_url" class="form-control" id="recipient-name"
                       value=" {{ review.image_url }}" />
@@ -219,17 +227,13 @@
     <script>
       function deleteBtn(reviewId) {
         if (confirm('이 리뷰를 삭제하시겠습니까?')) {
-          fetch('/delete_review/${reviewId}', {
-            method: 'GET'
-          }).then(response => {
-            if (response.ok) {
-              window.location.reload();
-            } else {
-              alert('리뷰를 삭제하는 데 실패했습니다.');
-            }
-          });
+          location.href = `/delete_review/${reviewId}`
+        } else {
+          alert('리뷰를 삭제하는 데 실패했습니다.');
         }
       }
+
+
       function deleteProfile() {
         if (confirm('정말로 계정을 삭제하시겠습니까?')) {
           document.getElementById('deleteProfileForm').submit();
